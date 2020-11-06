@@ -69,7 +69,9 @@ public class Song {
     //Var Funcs:
     public boolean equals(Song song) {
         
-        if (song.getName().equals(name) && song.getArtist().equals(artist) && song.getStyle().equals(style) && song.getLength() == length) {
+        if (song.getName().equals(name) && song.getArtist().equals(artist) &&
+                song.getStyle().equals(style) && song.getLength() == length) {
+            
             if (song.getAlbumName() == null || song.getAlbumName().equals(albumName)) {
                 return true;
             }

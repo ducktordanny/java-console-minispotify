@@ -22,12 +22,6 @@ public class Library {
         this.filename += name + ".dat";
         createFile();
     }
-    
-    public Library(String name, String filename) {
-        this.name = name;
-        this.filename += filename;
-        readFile();
-    }
 
 //Getters:
     public String getName() {
@@ -38,6 +32,10 @@ public class Library {
         return songs;
     }
     
+    public int getSize() {
+        return songs.size();
+    }
+        
 //Functions:
     
     //Voids:
@@ -61,6 +59,27 @@ public class Library {
             System.out.println("Song is already added!");
         }
         
+    }
+    
+    public void addByConsole() throws IOException {
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        
+        System.out.print("Szam cime: ");
+        String name = console.readLine();
+        System.out.print("Eloado neve: ");
+        String artist = console.readLine();
+        System.out.print("Stilus: ");
+        String style = console.readLine();
+        System.out.print("Szam hossza(masodp): ");
+        int length = Integer.parseInt(console.readLine());
+        System.out.print("Album neve ha van(egyebkent enter): ");
+        String album = console.readLine();
+        
+        if (album.equals("")) {
+            add(new Song(name, artist, style, length));
+        } else {
+            add(new Song(name, artist, style, length, album));
+        }
     }
     
     private void createFile() {
@@ -119,6 +138,66 @@ public class Library {
         }
     }
     
+    public void removeSongFromLibrary() throws IOException {
+        BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+        String exit;
+        do {
+            System.out.print("Adja meg a szam cimet: ");
+            String name = console.readLine();
+            System.out.print("Adja meg a szam eloadojat: ");
+            String artist = console.readLine();
+            
+            if (isValidArtistInLib(artist) && isValidNameInLib(name)) {
+                FileWriter file = new FileWriter(filename, false);
+                
+                try {
+                    for (int i = 0; i < songs.size(); i++) {
+                        if (songs.get(i).getArtist().toLowerCase().equals(artist.toLowerCase()) &&
+                                songs.get(i).getName().toLowerCase().equals(name.toLowerCase())) {
+                            songs.remove(i);
+                            i--;
+                        } else {
+                            file.write(songs.get(i).getName() + " &_next ");
+                            file.write(songs.get(i).getArtist() + " &_next ");
+                            file.write(songs.get(i).getStyle() + " &_next ");
+                            file.write(String.valueOf(songs.get(i).getLength()));
+                            
+                            if (songs.get(i).getAlbumName() != null) {
+                                file.write(" &_next " + songs.get(i).getAlbumName());
+                            }
+                            file.write("\n");
+                        }
+                    }
+                    file.close();
+                } catch (IOException e) {
+                    System.out.println("An error occurred.");
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("Nincs ilyen zene a lejatszasi listaban!");
+            }
+            
+            System.out.print("Kivan tovabbi szamokat torolni? (y/n) ");
+            exit = console.readLine();
+        } while (!exit.toLowerCase().equals("n"));
+    }
+    
+    public void removeLib() {
+        try {
+            File file = new File(filename);           //file to be delete  
+            if (file.delete()) //returns Boolean value  
+            {
+                System.out.println(name + " deleted");   //getting and printing the file name  
+            } else {
+                System.out.println("Failed to delete.");
+            }
+        } catch (Exception e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    
+    }
+    
     //Var Funcs:
     public boolean isSongAdded(Song song) {
         //it gives back if a song is already in library
@@ -133,7 +212,16 @@ public class Library {
     
     public boolean isValidArtistInLib(String artist) {
         for (Song song : songs) {
-            if (song.getArtist().equals(artist)) {
+            if (song.getArtist().toLowerCase().equals(artist.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public boolean isValidNameInLib(String name) {
+        for (Song song : songs) {
+            if (song.getName().toLowerCase().equals(name.toLowerCase())) {
                 return true;
             }
         }
